@@ -1,6 +1,7 @@
 package tgbotapi
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 )
@@ -154,6 +155,23 @@ func TestMessageEntityParseURLBad(t *testing.T) {
 
 	if _, err := entity.ParseURL(); err == nil {
 		t.Fail()
+	}
+}
+
+func TestMessageEntityCustomEmojiIDMarshal(t *testing.T) {
+	entity := MessageEntity{
+		Type:          "custom_emoji",
+		Offset:        0,
+		Length:        2,
+		CustomEmojiID: "5373149502003747704",
+	}
+
+	data, err := json.Marshal(entity)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := string(data), `{"type":"custom_emoji","offset":0,"length":2,"custom_emoji_id":"5373149502003747704"}`; got != want {
+		t.Fatalf("unexpected json: got %s want %s", got, want)
 	}
 }
 

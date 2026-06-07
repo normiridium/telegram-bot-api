@@ -729,6 +729,10 @@ type MessageEntity struct {
 	//
 	// optional
 	User *User `json:"user,omitempty"`
+	// CustomEmojiID for “custom_emoji” only, unique identifier of the custom emoji.
+	//
+	// optional
+	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
 	// Language for “pre” only, the programming language of the entity text
 	//
 	// optional
