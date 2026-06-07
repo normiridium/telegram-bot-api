@@ -1,6 +1,7 @@
 package tgbotapi
 
 import (
+	"encoding/json"
 	"testing"
 )
 
@@ -175,6 +176,48 @@ func TestNewInlineKeyboardButtonLoginURL(t *testing.T) {
 		result.LoginURL.BotUsername != "username" ||
 		result.LoginURL.RequestWriteAccess != false {
 		t.Fail()
+	}
+}
+
+func TestNewKeyboardButtonIconStyled(t *testing.T) {
+	result := NewKeyboardButtonIconStyled("accept", "5289978022957440232", ButtonStyleSuccess)
+
+	if result.Text != "accept" ||
+		result.IconCustomEmojiID != "5289978022957440232" ||
+		result.Style != ButtonStyleSuccess {
+		t.Fail()
+	}
+
+	data, err := json.Marshal(result)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const expected = `{"text":"accept","icon_custom_emoji_id":"5289978022957440232","style":"success"}`
+	if string(data) != expected {
+		t.Fatalf("unexpected json: %s", data)
+	}
+}
+
+func TestNewInlineKeyboardButtonDataIconStyled(t *testing.T) {
+	result := NewInlineKeyboardButtonDataIconStyled("accept", "roleplay:accept", "5289978022957440232", ButtonStyleSuccess)
+
+	if result.Text != "accept" ||
+		result.CallbackData == nil ||
+		*result.CallbackData != "roleplay:accept" ||
+		result.IconCustomEmojiID != "5289978022957440232" ||
+		result.Style != ButtonStyleSuccess {
+		t.Fail()
+	}
+
+	data, err := json.Marshal(result)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const expected = `{"text":"accept","icon_custom_emoji_id":"5289978022957440232","style":"success","callback_data":"roleplay:accept"}`
+	if string(data) != expected {
+		t.Fatalf("unexpected json: %s", data)
 	}
 }
 

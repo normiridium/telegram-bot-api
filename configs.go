@@ -46,6 +46,13 @@ const (
 	ModeHTML       = "HTML"
 )
 
+// Constant values for Telegram button styles.
+const (
+	ButtonStyleDanger  = "danger"
+	ButtonStyleSuccess = "success"
+	ButtonStylePrimary = "primary"
+)
+
 // Constant values for update types
 const (
 	// UpdateTypeMessage is new incoming message of any kind — text, photo, sticker, etc.

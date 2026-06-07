@@ -618,6 +618,33 @@ func NewKeyboardButton(text string) KeyboardButton {
 	}
 }
 
+// NewKeyboardButtonIcon creates a regular keyboard button with a custom emoji
+// shown before the text.
+func NewKeyboardButtonIcon(text, iconCustomEmojiID string) KeyboardButton {
+	return KeyboardButton{
+		Text:              text,
+		IconCustomEmojiID: iconCustomEmojiID,
+	}
+}
+
+// NewKeyboardButtonStyled creates a regular keyboard button with a style.
+func NewKeyboardButtonStyled(text, style string) KeyboardButton {
+	return KeyboardButton{
+		Text:  text,
+		Style: style,
+	}
+}
+
+// NewKeyboardButtonIconStyled creates a regular keyboard button with a custom
+// emoji shown before the text and a style.
+func NewKeyboardButtonIconStyled(text, iconCustomEmojiID, style string) KeyboardButton {
+	return KeyboardButton{
+		Text:              text,
+		IconCustomEmojiID: iconCustomEmojiID,
+		Style:             style,
+	}
+}
+
 // NewKeyboardButtonContact creates a keyboard button that requests
 // user contact information upon click.
 func NewKeyboardButtonContact(text string) KeyboardButton {
@@ -671,6 +698,31 @@ func NewInlineKeyboardButtonData(text, data string) InlineKeyboardButton {
 		Text:         text,
 		CallbackData: &data,
 	}
+}
+
+// NewInlineKeyboardButtonDataIcon creates an inline keyboard button with text,
+// data for a callback and a custom emoji shown before the text.
+func NewInlineKeyboardButtonDataIcon(text, data, iconCustomEmojiID string) InlineKeyboardButton {
+	button := NewInlineKeyboardButtonData(text, data)
+	button.IconCustomEmojiID = iconCustomEmojiID
+	return button
+}
+
+// NewInlineKeyboardButtonDataStyled creates an inline keyboard button with text,
+// data for a callback and a style.
+func NewInlineKeyboardButtonDataStyled(text, data, style string) InlineKeyboardButton {
+	button := NewInlineKeyboardButtonData(text, data)
+	button.Style = style
+	return button
+}
+
+// NewInlineKeyboardButtonDataIconStyled creates an inline keyboard button with
+// text, data for a callback, a custom emoji shown before the text and a style.
+func NewInlineKeyboardButtonDataIconStyled(text, data, iconCustomEmojiID, style string) InlineKeyboardButton {
+	button := NewInlineKeyboardButtonData(text, data)
+	button.IconCustomEmojiID = iconCustomEmojiID
+	button.Style = style
+	return button
 }
 
 // NewInlineKeyboardButtonLoginURL creates an inline keyboard button with text

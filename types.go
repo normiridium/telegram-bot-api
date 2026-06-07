@@ -1258,12 +1258,22 @@ type ReplyKeyboardMarkup struct {
 
 // KeyboardButton represents one button of the reply keyboard. For simple text
 // buttons String can be used instead of this object to specify text of the
-// button. Optional fields request_contact, request_location, and request_poll
-// are mutually exclusive.
+// button. At most one of the fields other than Text, IconCustomEmojiID, and
+// Style must be used to specify the type of the button.
 type KeyboardButton struct {
 	// Text of the button. If none of the optional fields are used,
 	// it will be sent as a message when the button is pressed.
 	Text string `json:"text"`
+	// IconCustomEmojiID is a unique identifier of the custom emoji shown before
+	// the text of the button.
+	//
+	// optional
+	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
+	// Style is the style of the button. Must be one of "danger", "success" or
+	// "primary". If omitted, then an app-specific style is used.
+	//
+	// optional
+	Style string `json:"style,omitempty"`
 	// RequestContact if True, the user's phone number will be sent
 	// as a contact when the button is pressed.
 	// Available in private chats only.
@@ -1324,8 +1334,9 @@ type InlineKeyboardMarkup struct {
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
 
-// InlineKeyboardButton represents one button of an inline keyboard. You must
-// use exactly one of the optional fields.
+// InlineKeyboardButton represents one button of an inline keyboard. Exactly one
+// of the fields other than Text, IconCustomEmojiID, and Style must be used to
+// specify the type of the button.
 //
 // Note that some values are references as even an empty string
 // will change behavior.
@@ -1334,6 +1345,16 @@ type InlineKeyboardMarkup struct {
 type InlineKeyboardButton struct {
 	// Text label text on the button
 	Text string `json:"text"`
+	// IconCustomEmojiID is a unique identifier of the custom emoji shown before
+	// the text of the button.
+	//
+	// optional
+	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
+	// Style is the style of the button. Must be one of "danger", "success" or
+	// "primary". If omitted, then an app-specific style is used.
+	//
+	// optional
+	Style string `json:"style,omitempty"`
 	// URL HTTP or tg:// url to be opened when button is pressed.
 	//
 	// optional
