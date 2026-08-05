@@ -91,3 +91,21 @@ func TestAddFirstValid(t *testing.T) {
 	assertLen(t, params, 2)
 	assertEq(t, params["value2"], "3")
 }
+
+func TestRichMessageConfigParams(t *testing.T) {
+	config := NewRichMessageMarkdown(42, "# Title\n\n- item")
+	config.ReplyToMessageID = 7
+	config.AllowSendingWithoutReply = true
+
+	params, err := config.params()
+	if err != nil {
+		t.Fatalf("unexpected params error: %v", err)
+	}
+	assertEq(t, config.method(), "sendRichMessage")
+	assertEq(t, params["chat_id"], "42")
+	assertEq(t, params["rich_message"], `{"markdown":"# Title\n\n- item"}`)
+	assertEq(t, params["reply_parameters"], `{"message_id":7,"allow_sending_without_reply":true}`)
+	if params["reply_to_message_id"] != "" {
+		t.Fatalf("sendRichMessage must use reply_parameters, got legacy reply_to_message_id=%q", params["reply_to_message_id"])
+	}
+}

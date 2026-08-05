@@ -353,6 +353,77 @@ func (config MessageConfig) method() string {
 	return "sendMessage"
 }
 
+// ReplyParameters describes reply parameters for the message that is being sent.
+type ReplyParameters struct {
+	MessageID                int             `json:"message_id,omitempty"`
+	ChatID                   interface{}     `json:"chat_id,omitempty"`
+	EphemeralMessageID       int             `json:"ephemeral_message_id,omitempty"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply,omitempty"`
+	Quote                    string          `json:"quote,omitempty"`
+	QuoteParseMode           string          `json:"quote_parse_mode,omitempty"`
+	QuoteEntities            []MessageEntity `json:"quote_entities,omitempty"`
+	QuotePosition            int             `json:"quote_position,omitempty"`
+	ChecklistTaskID          int             `json:"checklist_task_id,omitempty"`
+	PollOptionID             string          `json:"poll_option_id,omitempty"`
+}
+
+// InputRichMessage describes a rich message to be sent.
+type InputRichMessage struct {
+	Blocks              []interface{} `json:"blocks,omitempty"`
+	HTML                string        `json:"html,omitempty"`
+	Markdown            string        `json:"markdown,omitempty"`
+	Media               []interface{} `json:"media,omitempty"`
+	IsRTL               bool          `json:"is_rtl,omitempty"`
+	SkipEntityDetection bool          `json:"skip_entity_detection,omitempty"`
+}
+
+// RichMessageConfig contains information about a sendRichMessage request.
+type RichMessageConfig struct {
+	BaseChat
+	MessageThreadID       int
+	DirectMessagesTopicID int
+	RichMessage           InputRichMessage
+	ProtectContent        bool
+	AllowPaidBroadcast    bool
+	ReplyParameters       *ReplyParameters
+}
+
+func (config RichMessageConfig) params() (Params, error) {
+	params := make(Params)
+
+	if err := params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername); err != nil {
+		return params, err
+	}
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+	params.AddNonZero("direct_messages_topic_id", config.DirectMessagesTopicID)
+	params.AddBool("disable_notification", config.DisableNotification)
+	params.AddBool("protect_content", config.ProtectContent)
+	params.AddBool("allow_paid_broadcast", config.AllowPaidBroadcast)
+
+	replyParameters := config.ReplyParameters
+	if replyParameters == nil && config.ReplyToMessageID != 0 {
+		replyParameters = &ReplyParameters{
+			MessageID:                config.ReplyToMessageID,
+			AllowSendingWithoutReply: config.AllowSendingWithoutReply,
+		}
+	}
+	if err := params.AddInterface("reply_parameters", replyParameters); err != nil {
+		return params, err
+	}
+	if err := params.AddInterface("reply_markup", config.ReplyMarkup); err != nil {
+		return params, err
+	}
+	if err := params.AddInterface("rich_message", config.RichMessage); err != nil {
+		return params, err
+	}
+
+	return params, nil
+}
+
+func (config RichMessageConfig) method() string {
+	return "sendRichMessage"
+}
+
 // ForwardConfig contains information about a ForwardMessage request.
 type ForwardConfig struct {
 	BaseChat

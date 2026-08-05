@@ -65,6 +65,15 @@ func TestNewInlineQueryResultArticleHTML(t *testing.T) {
 	}
 }
 
+func TestNewRichMessageMarkdown(t *testing.T) {
+	result := NewRichMessageMarkdown(42, "# Title")
+
+	if result.ChatID != 42 ||
+		result.RichMessage.Markdown != "# Title" {
+		t.Fail()
+	}
+}
+
 func TestNewInlineQueryResultGIF(t *testing.T) {
 	result := NewInlineQueryResultGIF("id", "google.com")
 

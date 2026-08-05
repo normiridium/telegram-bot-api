@@ -18,6 +18,18 @@ func NewMessage(chatID int64, text string) MessageConfig {
 	}
 }
 
+// NewRichMessageMarkdown creates a rich message from Telegram rich markdown.
+func NewRichMessageMarkdown(chatID int64, markdown string) RichMessageConfig {
+	return RichMessageConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		RichMessage: InputRichMessage{
+			Markdown: markdown,
+		},
+	}
+}
+
 // NewDeleteMessage creates a request to delete a message.
 func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 	return DeleteMessageConfig{
