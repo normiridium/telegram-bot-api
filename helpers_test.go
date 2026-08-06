@@ -74,6 +74,18 @@ func TestNewRichMessageMarkdown(t *testing.T) {
 	}
 }
 
+func TestNewRichMessageHTMLWithMedia(t *testing.T) {
+	result := NewRichMessageHTMLWithMedia(42, "<b>Title</b>", []InputRichMessageMedia{
+		NewInputRichMessageMediaPhoto("formula_1", FileBytes{Name: "formula.png", Bytes: []byte{1}}),
+	})
+
+	if result.ChatID != 42 ||
+		result.RichMessage.HTML != "<b>Title</b>" ||
+		len(result.RichMessage.Media) != 1 {
+		t.Fail()
+	}
+}
+
 func TestNewInlineQueryResultGIF(t *testing.T) {
 	result := NewInlineQueryResultGIF("id", "google.com")
 

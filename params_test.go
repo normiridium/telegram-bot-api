@@ -109,3 +109,26 @@ func TestRichMessageConfigParams(t *testing.T) {
 		t.Fatalf("sendRichMessage must use reply_parameters, got legacy reply_to_message_id=%q", params["reply_to_message_id"])
 	}
 }
+
+func TestRichMessageConfigParamsWithUploadMedia(t *testing.T) {
+	config := NewRichMessageHTMLWithMedia(42, `<img src="tg://photo?id=formula_1">`, []InputRichMessageMedia{
+		NewInputRichMessageMediaPhoto("formula_1", FileBytes{Name: "formula.png", Bytes: []byte{1, 2, 3}}),
+	})
+
+	params, err := config.params()
+	if err != nil {
+		t.Fatalf("unexpected params error: %v", err)
+	}
+	assertEq(t, config.method(), "sendRichMessage")
+	assertEq(t, params["chat_id"], "42")
+	assertEq(t, params["rich_message"], `{"html":"\u003cimg src=\"tg://photo?id=formula_1\"\u003e","media":[{"id":"formula_1","media":{"type":"photo","media":"attach://file-0","caption_entities":null}}]}`)
+
+	files := config.files()
+	if len(files) != 1 {
+		t.Fatalf("expected 1 upload file, got %d", len(files))
+	}
+	assertEq(t, files[0].Name, "file-0")
+	if _, ok := files[0].Data.(FileBytes); !ok {
+		t.Fatalf("expected FileBytes upload, got %T", files[0].Data)
+	}
+}

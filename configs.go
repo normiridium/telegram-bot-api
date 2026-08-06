@@ -377,6 +377,15 @@ type InputRichMessage struct {
 	SkipEntityDetection bool          `json:"skip_entity_detection,omitempty"`
 }
 
+// InputRichMessageMedia describes a named rich-message media item.
+//
+// Rich text can reference the item with tg://photo?id=<id>. Media should be one
+// of the InputMedia* types, usually InputMediaPhoto.
+type InputRichMessageMedia struct {
+	ID    string      `json:"id"`
+	Media interface{} `json:"media"`
+}
+
 // RichMessageConfig contains information about a sendRichMessage request.
 type RichMessageConfig struct {
 	BaseChat
@@ -413,7 +422,10 @@ func (config RichMessageConfig) params() (Params, error) {
 	if err := params.AddInterface("reply_markup", config.ReplyMarkup); err != nil {
 		return params, err
 	}
-	if err := params.AddInterface("rich_message", config.RichMessage); err != nil {
+
+	richMessage := config.RichMessage
+	richMessage.Media = prepareInputRichMessageMediaForParams(richMessage.Media)
+	if err := params.AddInterface("rich_message", richMessage); err != nil {
 		return params, err
 	}
 
@@ -422,6 +434,10 @@ func (config RichMessageConfig) params() (Params, error) {
 
 func (config RichMessageConfig) method() string {
 	return "sendRichMessage"
+}
+
+func (config RichMessageConfig) files() []RequestFile {
+	return prepareInputRichMessageMediaForFiles(config.RichMessage.Media)
 }
 
 // ForwardConfig contains information about a ForwardMessage request.
@@ -2538,6 +2554,78 @@ func prepareInputMediaForFiles(inputMedia []interface{}) []RequestFile {
 
 	for idx, media := range inputMedia {
 		if file := prepareInputMediaFile(media, idx); file != nil {
+			files = append(files, file...)
+		}
+	}
+
+	return files
+}
+
+// prepareInputRichMessageMediaParam evaluates a single rich-message media item
+// and rewrites uploadable InputMedia files to attach:// references.
+func prepareInputRichMessageMediaParam(inputMedia interface{}, idx int) interface{} {
+	switch m := inputMedia.(type) {
+	case InputRichMessageMedia:
+		if param := prepareInputMediaParam(m.Media, idx); param != nil {
+			m.Media = param
+		}
+		return m
+	case *InputRichMessageMedia:
+		if m == nil {
+			return nil
+		}
+		copy := *m
+		if param := prepareInputMediaParam(copy.Media, idx); param != nil {
+			copy.Media = param
+		}
+		return copy
+	}
+
+	return inputMedia
+}
+
+// prepareInputRichMessageMediaFile generates upload files for rich-message
+// media items.
+func prepareInputRichMessageMediaFile(inputMedia interface{}, idx int) []RequestFile {
+	switch m := inputMedia.(type) {
+	case InputRichMessageMedia:
+		return prepareInputMediaFile(m.Media, idx)
+	case *InputRichMessageMedia:
+		if m == nil {
+			return nil
+		}
+		return prepareInputMediaFile(m.Media, idx)
+	}
+
+	return nil
+}
+
+// prepareInputRichMessageMediaForParams prepares rich-message media for JSON
+// params without mutating the original config.
+func prepareInputRichMessageMediaForParams(inputMedia []interface{}) []interface{} {
+	if len(inputMedia) == 0 {
+		return nil
+	}
+
+	newMedia := make([]interface{}, len(inputMedia))
+	copy(newMedia, inputMedia)
+
+	for idx, media := range inputMedia {
+		if param := prepareInputRichMessageMediaParam(media, idx); param != nil {
+			newMedia[idx] = param
+		}
+	}
+
+	return newMedia
+}
+
+// prepareInputRichMessageMediaForFiles collects upload files for rich-message
+// media items.
+func prepareInputRichMessageMediaForFiles(inputMedia []interface{}) []RequestFile {
+	files := []RequestFile{}
+
+	for idx, media := range inputMedia {
+		if file := prepareInputRichMessageMediaFile(media, idx); file != nil {
 			files = append(files, file...)
 		}
 	}

@@ -30,6 +30,70 @@ func NewRichMessageMarkdown(chatID int64, markdown string) RichMessageConfig {
 	}
 }
 
+// NewRichMessageMarkdownWithMedia creates a rich message from Telegram rich
+// markdown and named media attachments.
+func NewRichMessageMarkdownWithMedia(chatID int64, markdown string, media []InputRichMessageMedia) RichMessageConfig {
+	return RichMessageConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		RichMessage: InputRichMessage{
+			Markdown: markdown,
+			Media:    inputRichMessageMediaAsInterfaces(media),
+		},
+	}
+}
+
+// NewRichMessageHTML creates a rich message from Telegram rich HTML.
+func NewRichMessageHTML(chatID int64, html string) RichMessageConfig {
+	return RichMessageConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		RichMessage: InputRichMessage{
+			HTML: html,
+		},
+	}
+}
+
+// NewRichMessageHTMLWithMedia creates a rich message from Telegram rich HTML
+// and named media attachments.
+func NewRichMessageHTMLWithMedia(chatID int64, html string, media []InputRichMessageMedia) RichMessageConfig {
+	return RichMessageConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		RichMessage: InputRichMessage{
+			HTML:  html,
+			Media: inputRichMessageMediaAsInterfaces(media),
+		},
+	}
+}
+
+// NewInputRichMessageMedia creates a named media item for a rich message.
+func NewInputRichMessageMedia(id string, media interface{}) InputRichMessageMedia {
+	return InputRichMessageMedia{
+		ID:    id,
+		Media: media,
+	}
+}
+
+// NewInputRichMessageMediaPhoto creates a named photo item for a rich message.
+func NewInputRichMessageMediaPhoto(id string, media RequestFileData) InputRichMessageMedia {
+	return NewInputRichMessageMedia(id, NewInputMediaPhoto(media))
+}
+
+func inputRichMessageMediaAsInterfaces(media []InputRichMessageMedia) []interface{} {
+	if len(media) == 0 {
+		return nil
+	}
+	items := make([]interface{}, len(media))
+	for i := range media {
+		items[i] = media[i]
+	}
+	return items
+}
+
 // NewDeleteMessage creates a request to delete a message.
 func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 	return DeleteMessageConfig{
